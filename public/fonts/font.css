@@ -1,0 +1,13 @@
+@import "./font_face.css";
+
+:lang(zh){
+    font-family: HanHei SC,myriad,PingHei,PingFang SC,STHeitiSC-Light,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+}
+
+:lang(en){
+    font-family:"myriad";
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+}

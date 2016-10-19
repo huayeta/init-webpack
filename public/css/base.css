@@ -1,0 +1,46 @@
+@import "../../bower_components/normalize-css/normalize.css";
+
+body{
+    font-family: "Microsoft YaHei";
+    -webkit-font-smoothing: antialiased;
+}
+p{
+    margin: 0;
+    padding: 0;
+}
+ul{
+    margin: 0;
+    padding: 0;
+    li{
+        list-style: none;
+    }
+}
+h1,h2,h3,h4,h5{
+    margin: 0;
+    padding: 0;
+}
+
+.f-dn{
+    display: none;
+}
+.f-oh{
+    overflow: hidden;
+}
+.f-fl{
+    float: left;
+}
+.f-fr{
+    float: right;
+}
+.f-ml10{
+    margin-left: 10px;
+}
+.f-ml15{
+    margin-left: 15px;
+}
+.f-ml20{
+    margin-left: 20px;
+}
+.f-mr10{
+    margin-right: 10px;
+}

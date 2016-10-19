@@ -1,0 +1,23 @@
+{
+  "name": "init-static",
+  "description": "初始化项目",
+  "main": "index.js",
+  "authors": [
+    "zhuhui <zhuhui@lonlife.cn>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/huayeta/init-static",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "normalize-css": "^5.0.0",
+    "animate.css": "^3.5.2"
+  }
+}

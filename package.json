@@ -1,0 +1,39 @@
+{
+  "name": "dan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "gulp server",
+    "publish": "NODE_ENV='production' gulp publish"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.16.0",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^3.2.2",
+    "gulp-run-sequence": "^0.3.2",
+    "postcss-each": "^0.9.3",
+    "webpack": "^1.12.15"
+  },
+  "dependencies": {
+    "autoprefixer": "^6.3.7",
+    "css-mqpacker": "^5.0.1",
+    "cssnano": "^3.7.3",
+    "del": "^2.2.0",
+    "gulp-postcss": "^6.1.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "pixrem": "^3.0.1",
+    "postcss": "^5.1.0",
+    "postcss-color-rgba-fallback": "^2.2.0",
+    "postcss-functions": "^2.1.1",
+    "postcss-import": "^8.1.2",
+    "postcss-opacity": "^4.0.0",
+    "postcss-pseudoelements": "^3.0.0",
+    "postcss-vmin": "^2.0.0",
+    "postcss-will-change": "^1.1.0",
+    "precss": "^1.4.0"
+  }
+}
