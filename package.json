@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "gulp server",
-    "publish": "NODE_ENV='production' gulp publish"
+    "publish": "NODE_ENV='production' gulp publish",
+    "webpack.dev": "gulp webpack.dev"
   },
   "author": "",
   "license": "ISC",
@@ -34,7 +35,7 @@
     "postcss-vmin": "^2.0.0",
     "postcss-will-change": "^1.1.0",
     "precss": "^1.4.0",
-    "webpack": "^2.1.0-beta.25",
+    "webpack": "^2.2.0-rc.2",
     "webpack-stream": "^3.2.0",
     "whatwg-fetch": "^1.0.0"
   },

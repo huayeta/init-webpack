@@ -51,6 +51,11 @@ gulp.task('webpack',function(){
     .pipe(gulpWebpack(require('./webpack.config.js'),webpack))
     .pipe(gulp.dest('./dest/js/'))
 })
+gulp.task('webpack.dev',function(){
+    return gulp.src('./public/js/src/entry/index.js')
+    .pipe(gulpWebpack(require('./webpack.dev.config.js'),webpack))
+    .pipe(gulp.dest('./dest/js/'))
+})
 
 //postcss
 var baseCss=['./public/**/*.css'];

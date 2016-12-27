@@ -56,7 +56,7 @@ var config ={
     output:{
         path:path.join(__dirname,'./js/'),
         publicPath:'/dest/js/',
-        chunkFilename:'[name]-[chunkhash].js',
+        chunkFilename:'[id]-[name]-[hash]-[chunkhash].js',
         filename:'[name].js'
     },
     module:{
