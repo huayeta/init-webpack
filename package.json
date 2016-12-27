@@ -11,29 +11,32 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "browser-sync": "^2.16.0",
-    "gulp": "^3.9.1",
-    "gulp-connect": "^3.2.2",
-    "gulp-run-sequence": "^0.3.2",
-    "postcss-each": "^0.9.3",
-    "webpack": "^1.12.15"
-  },
-  "dependencies": {
     "autoprefixer": "^6.3.7",
+    "browser-sync": "^2.16.0",
     "css-mqpacker": "^5.0.1",
     "cssnano": "^3.7.3",
     "del": "^2.2.0",
+    "exports-loader": "^0.6.3",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^5.0.0",
     "gulp-postcss": "^6.1.1",
-    "gulp-sourcemaps": "^1.6.0",
+    "gulp-run-sequence": "^0.3.2",
+    "gulp-sourcemaps": "^2.1.1",
+    "imports-loader": "^0.6.5",
     "pixrem": "^3.0.1",
     "postcss": "^5.1.0",
     "postcss-color-rgba-fallback": "^2.2.0",
+    "postcss-each": "^0.9.3",
     "postcss-functions": "^2.1.1",
     "postcss-import": "^8.1.2",
     "postcss-opacity": "^4.0.0",
     "postcss-pseudoelements": "^3.0.0",
     "postcss-vmin": "^2.0.0",
     "postcss-will-change": "^1.1.0",
-    "precss": "^1.4.0"
-  }
+    "precss": "^1.4.0",
+    "webpack": "^2.1.0-beta.25",
+    "webpack-stream": "^3.2.0",
+    "whatwg-fetch": "^1.0.0"
+  },
+  "dependencies": {}
 }
