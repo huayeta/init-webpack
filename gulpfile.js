@@ -6,6 +6,7 @@ var browserSync=require('browser-sync').create();
 var runSequence=require('gulp-run-sequence');
 var gulpWebpack=require('webpack-stream');
 var webpack=require('webpack');
+var changed=require('gulp-changed');
 
 var isProduction=(process.env.NODE_ENV==='production'?true:false);
 
@@ -47,12 +48,12 @@ gulp.task('clean',['postcss-clean'])
 
 //webpack
 gulp.task('webpack',function(){
-    return gulp.src('./public/src/entry.js')
+    return gulp.src('./public/src/js//entry/index.js')
     .pipe(gulpWebpack(require('./webpack.config.js'),webpack))
     .pipe(gulp.dest('./dest/js/'))
 })
 gulp.task('webpack.dev',function(){
-    return gulp.src('./public/js/src/entry/index.js')
+    return gulp.src('./public/src/js/entry/index.js')
     .pipe(gulpWebpack(require('./webpack.dev.config.js'),webpack))
     .pipe(gulp.dest('./dest/js/'))
 })
@@ -67,6 +68,7 @@ gulp.task('postcss',function(){
             .pipe(gulp.dest('./dest/'))
     }else{
         return gulp.src(baseCss)
+            .pipe(changed('./dest/'))
             .pipe( sourcemaps.init() )
             .pipe(postcss(processors))
             .pipe( sourcemaps.write('.') )
