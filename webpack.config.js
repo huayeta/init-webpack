@@ -1,97 +1,105 @@
-'use strict';
+const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+let processors = require('./postcss.config.js');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var path=require('path');
-var webpack=require('webpack');
+const entry_path = path.resolve(__dirname, './public/src/js/entry/');
+let entry_files = {};
+fs.readdirSync(entry_path).filter(function(file) {
+    // return file.indexOf('.js')!==-1;
+    return true;
+}).forEach(function(file) {
+    let result = /^(.+)\.\w+?$/.exec(file);
+    entry_files[result[1] ? result[1] : file] = path.resolve(entry_path, file);
+})
 
-var JS_PATH=path.resolve(__dirname,'./public/src/');
-var node_modules=path.resolve(__dirname,'./node_modules/');
-var bower_components=path.resolve(__dirname,'./bower_components/');
-var DATE=Date.now();
+var isProduction = (process.env.NODE_ENV === 'production' ? true : false);
 
-var isProduction=(process.env.NODE_ENV==='production'?true:false);
-
-var plugins=[
-  new webpack.ProvidePlugin({
-    'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
-  }),
-  new webpack.DefinePlugin({
-      'process.env.NODE_ENV': (!isProduction?'"development"':'"production"')
-  }),
-  new webpack.NoErrorsPlugin()
+var plugins = [
+    new webpack.ProvidePlugin({
+        'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+    }),
+    new webpack.DefinePlugin({
+        __DEV__: isProduction,
+        __PRERELEASE__: isProduction
+    }),
+    new webpack.NoErrorsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin("commons", "commons.js"),
+    new ExtractTextPlugin("[name].css"),
+    new webpack.optimize.OccurrenceOrderPlugin(true),
+    new webpack.optimize.DedupePlugin(),
 ];
 
-if(isProduction){
-    plugins.push(
+if (isProduction) {
+    var arr=[
+        new webpack.optimize.OccurrenceOrderPlugin(true),
         new webpack.optimize.UglifyJsPlugin({
-            test:/(\.jsx|\.js|\.es6)$/,
-            compress:{
-                warnings:false
+            test: /(\.jsx|\.js|\.es6)$/,
+            compress: {
+                warnings: false
             }
-        })
-    )
+        }),
+    ]
+    plugins=[...plugins,...arr];
 }
-//插件
-var processors=global.processors;
-var jsPlugins= ['transform-runtime'];
-//得到入口文件
-var files;
-files=fs.readdirSync('./public/js/src/entry/').filter((file) => {
-    return (file.indexOf('.')!==-1) && (/\.js$/.test(file));
-});
 
-var config ={
-    context:__dirname+'./public/js/src/',
-    resolve:{
-        alias:{
-            'lib':path.resolve(__dirname,'./public/js/lib'),
-            'src':path.resolve(__dirname,'./public/js/src'),
-            'images':path.resolve(__dirname,'./public/images'),
+var configs = {
+    // context:path.resolve(__dirname,'./public/src/'),
+    entry: entry_files,
+    output: {
+        path: path.resolve(__dirname, './dist/js/'),
+        publicPath: '/dist/js/',
+        chunkFilename: '[id]-[name]-[hash]-[chunkhash].js',
+        filename: '[name].js'
+    },
+    module: {
+        noParse: /react|react-dom/,
+        loaders: [{
+            test: /\.css$/,
+            // loader: 'style-loader!css-loader!postcss-loader'
+            loader:ExtractTextPlugin.extract("style-loader", "css-loader",'postcss-loader')
+        }, {
+            test: /\.jsx$/,
+            loader: 'babel',
+            exclude: /(node_modules)/,
+            query: {
+                cacheDirectory: true,
+                presets: ['es2015', 'react', 'stage-0'],
+                plugins: ['transform-runtime']
+            },
+            exclude:/node_modules/
+        }, {
+            test: /\.es6$/,
+            loader: 'babel',
+            exclude: /(node_modules)/,
+            query: {
+                cacheDirectory: true,
+                presets: ['es2015', 'stage-0'],
+                plugins: ['transform-runtime']
+            }
+        }, {
+            test: /.(png|jpg)$/,
+            loader: "url-loader?limit=8192"
+        }]
+    },
+    devtool: isProduction ? null : 'source-map',
+    resolve: {
+        extensions: ['', '.js', '.json', '.es6', '.jsx','.css'],
+        root: [path.resolve(__dirname, './node_modules'), path.resolve(__dirname, './bower_components')],
+        moduleExtensions: ['-loader'],
+        alias: {
+            js: path.resolve(__dirname, './public/src/js/'),
+            css: path.resolve(__dirname, './public/src/css/')
         },
-        root:[
-            node_modules,bower_components
-        ],
-        extensions:['','.js','.jsx','.es6']
     },
-    entry:files,
-    output:{
-        path:path.join(__dirname,'./js/'),
-        publicPath:'/dest/js/',
-        chunkFilename:'[id]-[name]-[hash]-[chunkhash].js',
-        filename:'[name].js'
-    },
-    module:{
-        loaders:[
-            {test:/\.css$/,loader:'style-loader!css-loader!postcss-loader'},
-            {
-                test:/\.jsx$/,
-                loader:'babel',
-                exclude: /(node_modules)/,
-                query:{
-                    cacheDirectory:true,
-                    presets:['es2015','react','stage-0'],
-                    plugins: jsPlugins
-                }
-            },
-            {
-                test:/\.es6$/,
-                loader:'babel',
-                exclude: /(node_modules)/,
-                query:{
-                    cacheDirectory:true,
-                    presets:['es2015','stage-0'],
-                    plugins: jsPlugins
-                }
-            },
-            {test: /.(png|jpg)$/, loader: "url-loader?limit=25000"}
-        ],
-        noParse:[]
-    },
-    postcss:function(){
+    postcss: function() {
         return processors;
     },
-    plugins:plugins,
-    devtool : isProduction?null:'source-map'
+    plugins: plugins,
+    // externals:{
+    //     'react':'React',
+    //     'react-dom':'ReactDOM'
+    // }
 }
-
-
-module.exports = config;
+module.exports = configs;

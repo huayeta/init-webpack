@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "gulp server",
     "publish": "NODE_ENV='production' gulp publish",
-    "webpack.dev": "webpack --watch --progress --color --display-error-details --config webpack.dev.config.js"
+    "webpack": "webpack --progress --color --display-error-details --config webpack.config.js",
+    "webpack.watch": "NODE_ENV='production' webpack --watch --progress --color --display-error-details --config webpack.config.js"
   },
   "author": "",
   "license": "ISC",
