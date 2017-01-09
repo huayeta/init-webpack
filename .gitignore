@@ -2,5 +2,6 @@ node_modules/
 bower_components/
 dest/
 dist/
+dump.rdb
 .DS_Store
 npm-debug.log

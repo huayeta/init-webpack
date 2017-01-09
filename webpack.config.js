@@ -38,20 +38,24 @@ var currentTarget = process.env.npm_lifecycle_event;
 
 var debug,          // is debug
     devServer,      // is hrm mode
-    minimize;       // is minimize
+    minimize,       // is minimize
+    proxy;       // is proxy
 
 
 if (currentTarget == "build") { // online mode （线上模式）
 
-    debug = false, devServer = false, minimize = true;
+    debug = false, devServer = false, minimize = true, proxy=false;
 
 } else if (currentTarget == "dev") { // dev mode （开发模式）
 
-    debug = true, devServer = false, minimize = false;
+    debug = true, devServer = false, minimize = false, proxy=false;
 
 } else if (currentTarget == "dev-hrm") { // dev HRM mode （热更新模式）
 
-    debug = true, devServer = true, minimize = false;
+    debug = true, devServer = true, minimize = false, proxy=false;
+} else if (currentTarget == "dev-hrm-proxy"){ // 热替换并代理服务器
+
+    debug = true, devServer = true, minimize = false, proxy=true;
 }
 
 var PATHS = {
@@ -91,7 +95,7 @@ var resolve = {
      * An array of extensions that should be used to resolve modules
      * （引用时可以忽略后缀）
      * */
-    extensions: ['', '.js', '.css', '.es6', '.less', '.scss' , '.png', '.jpg'],
+    extensions: ['', '.js', '.css', '.es6', '.less', '.scss' , '.png', '.jpg', '.html', '.htm'],
 
 
     /*
@@ -113,6 +117,8 @@ var resolve = {
          css:path.resolve(PATHS.srcPath,'./css'),
          js:path.resolve(PATHS.srcPath,'./js'),
          fonts:path.resolve(PATHS.srcPath,'./fonts'),
+         views:path.resolve(PATHS.srcPath,'views'),
+         images:path.resolve(PATHS.srcPath,'images'),
 
         /*
          * js
@@ -176,8 +182,9 @@ var loaders = [
      * （html loader）
      * */
     {
-        test: /\.html$/,
-        loader: "html"
+        test: /\.(htm|html)$/,
+        loader:"raw-loader",
+        // loader: "html"
         // loader: "html?-minimize"
     },
 
@@ -247,26 +254,48 @@ var loaders = [
 
 var plugins = [
     new webpack.ProvidePlugin({
-        'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+        'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch',
+        // $: "jquery",
+        // jQuery: "jquery",
+        // "window.jQuery": "jquery"
     }),
+
+    /*
+     * gloabal flag
+     * （全局标识）
+     * */
     new webpack.DefinePlugin({
-        __DEV__: debug
+        /*
+         * dev flag
+         * （开发标识）
+         * */
+        __DEV__: debug,
+
+        /*
+         * proxy flag
+         * （代理的标识）
+         * */
+        __DEVAPI__: devServer ? "/devApi/" : "''",
     }),
+
     new webpack.NoErrorsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin("commons", "commons.js"),
+
+    /*
+     * common js
+     * （公共js）
+     * */
+    new webpack.optimize.CommonsChunkPlugin(
+        devServer ?
+        {name: "common", filename: "js/common.js"}:
+        {names: ["common", "webpackAssets"]}
+    ),
+
     /*
      * extract css
      * （提取css文件到单独的文件中）
      */
     new ExtractTextPlugin(devServer ? "css/[name].css" : "css/[name]-[chunkhash:8].css", {allChunks: true}),
-    /*
-     *  （如：使用jquery 可以直接使用符号 "$"）
-     * */
-    new webpack.ProvidePlugin({
-        $: "jquery",
-        jQuery: "jquery",
-        "window.jQuery": "jquery"
-    }),
+
     /*
      * （发布前清空发布目录）
      * */
@@ -275,14 +304,36 @@ var plugins = [
         verbose: true,// Write logs to console.
         dry: false // Do not delete anything, good for testing.
     }),
+
     /*
      * （避免在文件不改变的情况下hash值不变化）
      * */
     new webpack.optimize.OccurrenceOrderPlugin(true),
+
     /*
      * （删除重复依赖的文件）
      */
     new webpack.optimize.DedupePlugin(),
+
+    /*
+     *create html file
+     * （创建html文件）
+     * */
+     new HtmlWebpackPlugin({
+         filename:'views/index.htm',
+         template:__dirname+'/src/views/index.htm',
+         inject: 'true',
+
+         // 需要依赖的模块
+         chunks: ['common', 'index','webpackAssets'],
+
+         // 根据依赖自动排序
+         chunksSortMode: 'dependency',
+         minify:{
+             removeComments:true, //移除HTML中的注释
+             collapseWhitespace:false, //删除空白符与换行符
+         }
+     }),
 ];
 
 if (minimize) {
@@ -306,7 +357,10 @@ if (minimize) {
 
 var config = {
     // context:path.resolve(__dirname,'./public/src/'),
-    entry: entry,
+    // entry: entry,
+    entry: {
+        index:__dirname+'/src/js/index',
+    },
     output: output,
     module: {
         noParse: /react|react-dom|jquery/,
@@ -329,46 +383,73 @@ var config = {
  * */
 if (devServer) {
 
-    /*
-     * （代理访问地址）
-     * */
-    var proxyTarget = 'http://localhost:8081/';
     var port=8888;
 
-    config = Merge(
-        config,
-        {
-            plugins: [
-                new webpack.HotModuleReplacementPlugin({
-                    multiStep: true
-                }),
-                new OpenBrowserPlugin({url: 'http://localhost:'+port})
-            ],
-            devServer: {
-                historyApiFallback: true,
-                hot: true,
-                inline: true,
-                stats: 'errors-only',
-                host: "localhost", // Defaults to `localhost`   process.env.HOST
-                port: port,  // Defaults to 8080   process.env.PORT
-                /*
-                 *  代理访问
-                 *  1、可以绕过同源策略 和 webpack '热更新'结合使用
-                 */
-                proxy: {
-                    '*': {
-                        target: proxyTarget,
-                        secure: true,
-                        /*
-                         * rewrite 的方式扩展性更强，不限制服务的名称
-                         * */
-                        rewrite: function (req) {
-                            // req.url = req.url.replace(/^\/devApi/, '');
+    if(proxy){
+        /*
+         * （代理访问地址）
+         * */
+        var proxyTarget = 'http://localhost:8081/';
+
+        config = Merge(
+            config,
+            {
+                plugins: [
+                    new webpack.HotModuleReplacementPlugin({
+                        multiStep: true
+                    }),
+                    // new OpenBrowserPlugin({url: 'http://localhost:'+port})
+                ],
+                devServer: {
+                    historyApiFallback: true,
+                    hot: true,
+                    inline: true,
+                    stats: 'errors-only',
+                    host: "localhost", // Defaults to `localhost`   process.env.HOST
+                    port: port,  // Defaults to 8080   process.env.PORT
+                    /*
+                     *  代理访问
+                     *  1、可以绕过同源策略 和 webpack '热更新'结合使用
+                     */
+                    proxy: {
+                        '*': {
+                            target: proxyTarget,
+                            secure: true,
+                            /*
+                             * rewrite 的方式扩展性更强，不限制服务的名称
+                             * */
+                            rewrite: function (req) {
+                                // req.url = req.url.replace(/^\/devApi/, '');
+                            }
                         }
                     }
                 }
             }
-        }
-    );
+        );
+    }else{
+
+        /**
+         * 热替换
+         */
+        config = Merge(
+            config,
+            {
+                plugins: [
+                    new webpack.HotModuleReplacementPlugin({
+                        multiStep: true
+                    }),
+                    // new OpenBrowserPlugin({url: 'http://localhost:'+port+'/dist/views/index.htm'}),
+                ],
+                devServer: {
+                    historyApiFallback: true,
+                    hot: true,
+                    inline: true,
+                    stats: 'errors-only',
+                    host: "localhost", // Defaults to `localhost`   process.env.HOST
+                    port: port,  // Defaults to 8080   process.env.PORT]
+                }
+            }
+        );
+    }
 }
 module.exports = validate(config);
