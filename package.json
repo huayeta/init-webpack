@@ -11,6 +11,7 @@
     "dev-hrm": "webpack-dev-server --colors --progress",
     "dev-hrm-proxy":"webpack-dev-server --cloor --progress"
   },
+  "other":"https://github.com/huangshuwei/webpackForSPA.git",
   "author": "",
   "license": "ISC",
   "devDependencies": {
