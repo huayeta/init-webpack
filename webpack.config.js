@@ -363,7 +363,7 @@ var config = {
     },
     output: output,
     module: {
-        noParse: /react|react-dom|jquery/,
+        // noParse: /react|react-dom|jquery/,
         loaders: loaders,
     },
     devtool: debug ? 'source-map' : false,
