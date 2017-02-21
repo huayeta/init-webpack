@@ -9,9 +9,9 @@
     "build": "webpack  --profile --progress --colors --display-error-details",
     "dev": "webpack  --display-modules --profile --progress --colors --display-error-details",
     "dev-hrm": "webpack-dev-server --colors --progress",
-    "dev-hrm-proxy":"webpack-dev-server --cloor --progress"
+    "dev-hrm-proxy": "webpack-dev-server --cloor --progress"
   },
-  "other":"https://github.com/huangshuwei/webpackForSPA.git",
+  "other": "https://github.com/huangshuwei/webpackForSPA.git",
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -65,5 +65,7 @@
     "webpack-validator": "^2.3.0",
     "whatwg-fetch": "^1.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "normalize-css": "^2.3.1"
+  }
 }
